@@ -1,0 +1,107 @@
+#!/bin/perl
+
+use strict;
+
+use Config::Tiny;
+use Pod::Usage;
+use Getopt::Long;
+use DBI;
+
+use Data::Dumper;
+
+die "Plese set \$ODBCINI\n" unless $ENV{ODBCINI};
+
+my %h;
+
+GetOptions (\%h,
+        'help',
+        'man',
+        'dsn=s',
+        'Database=s',
+        'Password=s',
+        'Username=s',
+        'DBCName=s',
+        #'Driver' => '/opt/teradata/client/ODBC_64/lib/tdata.so',
+        'Description=s',
+        'DefaultDatabase=s') or pod2usage(2);
+
+pod2usage(1) if $h{help};
+pod2usage(-exitval => 0, -verbose => 2) if $h{man};
+
+# Open the config
+my  $config = Config::Tiny->read( $ENV{ODBCINI} );
+
+#so we need a dsn and a DBCName
+#the rest is optional
+if( !$h{dsn} && !$h{DBCName} ){
+        die "dsn and DBCName are required\n";
+}elsif( !$h{dsn} ){
+        die "dsn is required\n";
+}elsif( !$h{DBCName} ){
+        die "DBCName is required\n";
+}
+
+$config->{'ODBC Data Sources'}{$h{dsn}} = 'tdata.so';
+
+my $dsn = delete $h{dsn};
+$h{Driver} = '/opt/teradata/client/ODBC_64/lib/tdata.so';
+$config->{$dsn} = \%h;
+
+$config->write($ENV{ODBCINI});
+
+my $dbh = DBI->connect("dbi:ODBC:$dsn" );
+
+print Dumper ($dbh->selectall_arrayref(q{select count(*) from dbc.tables}));
+
+__END__
+
+=head1 td-odbc-add
+
+td-odbc-add - Add a Teradata oodbc.ini entry and try to connect to it
+
+=head1 SYNOPSIS
+
+td-odbc-add --dsn=<section> --DBCName=<td server> [options] 
+
+ Options:
+   -Database=string        
+   -Password=string       
+   -Username=string      
+   -Description=string 
+   -DefaultDatabase=string
+   -help                   brief help message
+   -man                    full documentation
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-dsn>
+
+The section name in odbc.ini
+
+=item B<-DBCName>
+
+The ip address or name of the Teradata server to connect to
+
+=item B<Others>
+
+Additional entries in the entry. 
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=back
+
+=head1 DESCRIPTION
+
+B<td-odbc-add> will add an entry to odbc.ini. It will then connect to the database defined
+It will over write any entry with that name.
+This is mainly used during the image build
+
+=cut
