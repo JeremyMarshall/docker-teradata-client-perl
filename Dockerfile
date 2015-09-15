@@ -9,7 +9,7 @@ FROM centos:centos7
   ENV ODBCHOME=/opt/teradata/client/ODBC_64/ ODBCINI=/opt/teradata/client/ODBC_64/odbc.ini
 
   RUN  yum -y install cpanm gcc perl perl-App-cpanminus perl-Config-Tiny &&  yum clean all
-  RUN cpanm install DBD::ODBC; rm -fr root/.cpanm; exit 0
+  ONBUILD RUN cpanm install DBD::ODBC; rm -fr root/.cpanm; exit 0
 
   #utility to add odbc sections in
   ADD td-odbc-add bin/td-odbc-add
