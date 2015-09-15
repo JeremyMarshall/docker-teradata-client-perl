@@ -9,7 +9,7 @@ use DBI;
 
 use Data::Dumper;
 
-die "Plese set \$ODBCINI\n" unless $ENV{ODBCINI};
+die "Please set \$ODBCINI\n" unless $ENV{ODBCINI};
 
 my %h;
 

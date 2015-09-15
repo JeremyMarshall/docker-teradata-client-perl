@@ -18,7 +18,7 @@ FROM jeremymarshall/docker-teradata-client-perl
 
 ```
 
-Supoorted parameters for td-odbc-add are:
+Supported parameters for td-odbc-add are:
 * dsn
 * Database
 * Password
