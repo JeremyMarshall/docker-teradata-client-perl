@@ -51,7 +51,7 @@ $config->write($ENV{ODBCINI});
 
 my $dbh = DBI->connect("dbi:ODBC:$dsn" );
 
-print Dumper ($dbh->selectall_arrayref(q{select count(*) from dbc.tables}));
+print Dumper ($dbh->selectall_arrayref(q{select * from dbc.dbcinfo}));
 
 __END__
 
